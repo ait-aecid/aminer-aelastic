@@ -28,8 +28,7 @@ def exitgracefully(signum, frame):
     """
     global ae
     ae.close()
-    raise SystemExit('Exiting')
-
+    sys.exit(0)
 
 def main():
     global ae
@@ -80,3 +79,4 @@ if __name__=='__main__':
     signal.signal(signal.SIGTERM, exitgracefully)
     signal.signal(signal.SIGUSR1, exitgracefully)
     main()
+

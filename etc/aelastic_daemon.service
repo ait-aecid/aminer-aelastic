@@ -6,12 +6,7 @@ Type=simple
 User=aminer
 Group=aminer
 ExecStart=/usr/lib/logdata-anomaly-miner/aelastic_daemon.py
-KillMode=control-group
-# Write everything to /dev/null: if AMiner is misconfigured, it
-# may detect anonamies in its own log data, thus creating a logging
-# loop. You may prefer logging to journal only, which needs journald
-# to be reconfigured with "ForwardToSyslog=false".
-StandardOutput=null
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
