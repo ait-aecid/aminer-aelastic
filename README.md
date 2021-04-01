@@ -19,14 +19,14 @@ sudo chown aminer:aminer /var/lib/aelastic
 # Poll manually
 
 ```
-sudo /usr/lib/logdata-anomaly-miner/aelastic_daemon.py
+sudo /usr/local/bin/aelasticd.py
 ```
 
 # Starting the daemon
 
 ```
-sudo systemctl enable aelastic_daemon
-sudo systemctl start aelastic_daemon
+sudo systemctl enable aelasticd
+sudo systemctl start aelasticd
 ```
 
 # Testing

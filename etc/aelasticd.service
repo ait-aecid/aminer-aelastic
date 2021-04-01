@@ -5,7 +5,7 @@ Description=Elasticsearch importer for AMiner
 Type=simple
 User=aminer
 Group=aminer
-ExecStart=/usr/lib/logdata-anomaly-miner/aelastic_daemon.py
+ExecStart=/usr/lib/aelastic/aelasticd.py
 Restart=on-failure
 
 [Install]

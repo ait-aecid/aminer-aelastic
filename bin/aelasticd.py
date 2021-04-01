@@ -12,12 +12,12 @@ import socket
 import configparser
 import logging
 import logging.config
+import argparse
 import signal
 
-from aelastic.metadata import __version_string__, __version__  # skipcq: FLK-E402
-
-sys.path = sys.path[1:]+['/usr/lib/logdata-anomaly-miner']
-from aelastic import Aelastic
+sys.path = sys.path[1:]+['/usr/lib/aelastic']
+from metadata import __version_string__, __version__  # skipcq: FLK-E402
+from aelastic import Aelastic # skipcq: FLK-E402
 
 CONFIGFILE = '/etc/aminer/elasticsearch.conf'
 unixpath = "/var/lib/aelastic/aminer.sock"
@@ -36,6 +36,11 @@ def main():
     global ae
     global unixpath
     global CONFIGFILE
+    description="A daemon that polls logs from elasticsearch and writes it to a unix-domain-socket(for logdata-anomaly-miner)"
+
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('-v', '--version', action='version', version=__version_string__)
+    args = parser.parse_args()
 
     config = configparser.ConfigParser()
     config.read(CONFIGFILE)
