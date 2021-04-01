@@ -1,6 +1,8 @@
 # aminer-aelastic
 
-This daemon polls logs from elasticsearch and writes it to a unix-domain-socket(for logdata-anomaly-miner)
+This daemon polls logs from elasticsearch and writes it to a unix-domain-socket(for [logdata-anomaly-miner](https://github.com/ait-aecid/logdata-anomaly-miner.git))
+
+**please note that this project is  work in progress**
 
 # Installation
 
@@ -30,7 +32,7 @@ sudo systemctl start aelastic_daemon
 # Testing
 
 Normally the daemon starts polling the elasticsearch as soon as some other programm reads from the unix-domain-socket.
-It is possible to read from the socket manually using the following command:
+It is possible to read from the socket manually using ncat(from nmap) as follows:
 
 ```
 sudo ncat -U /var/lib/aminer/aminer.sock
