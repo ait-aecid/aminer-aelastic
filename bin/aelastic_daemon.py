@@ -14,6 +14,8 @@ import logging
 import logging.config
 import signal
 
+from aelastic.metadata import __version_string__, __version__  # skipcq: FLK-E402
+
 sys.path = sys.path[1:]+['/usr/lib/logdata-anomaly-miner']
 from aelastic import Aelastic
 
