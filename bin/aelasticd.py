@@ -66,7 +66,7 @@ def main():
     if os.path.exists(unixpath):
         os.remove(unixpath)
 
-    logger.debug("starting unix domain socket server..")
+    logger.info("starting aelastic daemon...")
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.bind(unixpath)
     ae = Aelastic(**options)
@@ -76,6 +76,7 @@ def main():
             sock.listen(1)
             logger.debug("Socket: Waiting for connection...")
             conn, addr = sock.accept()
+            logger.debug("Socket-connection accepted")
             ae.setsock(conn)
             ae.run()
     except KeyboardInterrupt:

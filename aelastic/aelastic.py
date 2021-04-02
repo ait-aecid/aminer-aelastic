@@ -103,7 +103,7 @@ class Aelastic:
                                                       "search_after": self.sort})
 
             for hit in res['hits']['hits']:
-                self.logger.info(json.dumps(hit).encode("ascii"))
+                self.logger.debug(json.dumps(hit).encode("ascii"))
                 self.sock.send(json.dumps(hit).encode("ascii"))
                 self.sock.send("\n".encode())
 
@@ -156,11 +156,13 @@ class Aelastic:
             self.timer = threading.Timer(self.config['time'], self.handler)
             self.timer.start()
         except KeyboardInterrupt:
+            self.logger.debug("KeyboardInterrupt detected...")
             self.stopper = True
 
     def close(self):
         """Stops the socket and the scheduler
         """
+        self.logger.debug("Cleaning up socket and scheduler")
         self.stopper = True
         if self.timer is not None:
             self.timer.cancel()
