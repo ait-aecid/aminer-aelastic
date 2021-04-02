@@ -121,7 +121,7 @@ class Aelastic:
             self.logger.error("Error in elasticsearch-request", exc_info=False)
             self.sock.send("\n".encode())
             time.sleep(self.config['sleeptime'])
-        except BrokenPipeError:
+        except OSError:
             self.logger.error("Client disconnected", exc_info=False)
             self.stopper = True
 
