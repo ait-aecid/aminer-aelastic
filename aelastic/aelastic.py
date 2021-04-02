@@ -102,14 +102,15 @@ class Aelastic:
                                                       "sort": [{self.config['timestamp']: "asc"}],
                                                       "search_after": self.sort})
 
+            if res['hits']['hits']:
+                self.sort = res['hits']['hits'][-1]["sort"]
+                self.savestate()
+
             for hit in res['hits']['hits']:
                 self.logger.debug(json.dumps(hit).encode("ascii"))
                 self.sock.send(json.dumps(hit).encode("ascii"))
                 self.sock.send("\n".encode())
 
-            if res['hits']['hits']:
-                self.sort = res['hits']['hits'][-1]["sort"]
-                self.savestate()
 
         except ElasticsearchException:
             self.logger.error("Error in elasticsearch-request", exc_info=False)
