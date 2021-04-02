@@ -106,13 +106,13 @@ class Aelastic:
                 self.logger.info(json.dumps(hit).encode("ascii"))
                 self.sock.send(json.dumps(hit).encode("ascii"))
                 self.sock.send("\n".encode())
-                self.sock.send("\n".encode())
 
             if res['hits']['hits']:
                 self.sort = res['hits']['hits'][-1]["sort"]
 
         except ElasticsearchException:
             self.logger.error("Error in elasticsearch-request", exc_info=False)
+            self.sock.send("\n".encode())
             time.sleep(self.config['sleeptime'])
 
         if self.stopper is not True:
