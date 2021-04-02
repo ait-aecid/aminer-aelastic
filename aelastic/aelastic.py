@@ -160,12 +160,15 @@ class Aelastic:
         """Starts the scheduler
         """
         try:
+            self.stopper = False
             while self.stopper is False:
                 self.logger.debug("Starting another run..")
                 self.handler()
         except KeyboardInterrupt:
             self.logger.debug("KeyboardInterrupt detected...")
             self.stopper = True
+        finally:
+            self.close()
 
     def close(self):
         """Stops the socket and the scheduler
