@@ -106,7 +106,9 @@ class Aelastic:
                 self.sort = res['hits']['hits'][-1]["sort"]
                 self.savestate()
 
+#            print("######################################################################")
             for hit in res['hits']['hits']:
+#               print("%s - %s" % (hit['_id'],hit['_source']['@timestamp']))
                 self.logger.debug(json.dumps(hit).encode("ascii"))
                 self.sock.send(json.dumps(hit).encode("ascii"))
                 self.sock.send("\n".encode())
@@ -118,8 +120,8 @@ class Aelastic:
             self.sock.send("\n".encode())
             time.sleep(self.config['sleeptime'])
 
-        if self.stopper is not True:
-            self.run()
+#        if self.stopper is not True:
+#            self.run()
 
     def setsock(self, sock):
         """Setter for the unix-socket
@@ -155,9 +157,11 @@ class Aelastic:
         """Starts the scheduler
         """
         try:
-            self.logger.debug("Starting another run..")
-            self.timer = threading.Timer(self.config['time'], self.handler)
-            self.timer.start()
+            while self.stopper is False:
+                self.logger.debug("Starting another run..")
+                self.handler()
+#                self.timer = threading.Timer(self.config['time'], self.handler)
+#                self.timer.start()
         except KeyboardInterrupt:
             self.logger.debug("KeyboardInterrupt detected...")
             self.stopper = True
@@ -167,8 +171,8 @@ class Aelastic:
         """
         self.logger.debug("Cleaning up socket and scheduler")
         self.stopper = True
-        if self.timer is not None:
-            self.timer.cancel()
+#        if self.timer is not None:
+#            self.timer.cancel()
         if self.sock is not None:
             self.sock.close()
         self.savestate()
