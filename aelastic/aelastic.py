@@ -106,10 +106,10 @@ class Aelastic:
                 self.sort = res['hits']['hits'][-1]["sort"]
                 self.savestate()
 
-            if self.config['output'] is True:
+            if self.config['output'] == 'True':
                 print("######################################################################")
             for hit in res['hits']['hits']:
-                if self.config['output'] is True:
+                if self.config['output'] == 'True':
                     print("%s - %s" % (hit['_id'],hit['_source']['@timestamp']))
                 self.logger.debug(json.dumps(hit).encode("ascii"))
                 self.sock.send(json.dumps(hit).encode("ascii"))
@@ -149,8 +149,9 @@ class Aelastic:
         try:
             filehandle = open(self.config['statefile'], 'r')
             self.sort = json.load(filehandle)
-            self.logger.debug("Statefile loaded with timestamp: %s",
-                              datetime.fromtimestamp(self.sort[0] / 1000))
+            if self.sort is not None:
+                self.logger.debug("Statefile loaded with timestamp: %s",
+                                  datetime.fromtimestamp(self.sort[0] / 1000))
             filehandle.close()
         except (IOError, json.JSONDecodeError):
             self.logger.error("Could not load state", exc_info=False)
