@@ -29,8 +29,6 @@ class Aelastic:
         timer for the scheduler
     stopper : boolean
         stops the scheduler
-    time : int
-        intervall for querying elasticsearch
     sock : socket
         unix-domain-socket of aminer
     elasticsearch : Elasticsearch
@@ -41,6 +39,8 @@ class Aelastic:
         Elasticsearch-field with the timestamp(for sorting)
     sleeptime: int
         Throttle-time if elasticsearch fails(reduces error-messages)
+    output: boolean
+        Prints _id and @timestamp to stdout if set to True
 
     Methods
     -------
@@ -54,12 +54,12 @@ class Aelastic:
     DEFAULT_CONFIG = {
         'unixsock': '/var/lib/aelastic/aminer.sock',
         'host': 'http://localhost:9200',
-        'time': 3,
         'searchsize': 100,
         'index': 'aminer',
         'statefile': '/var/lib/aelastic/state',
-        'savestate': 'True',
+        'savestate': True,
         'timestamp': '@timestamp',
+        'output': False,
         'sleeptime': 5
     }
 
@@ -106,9 +106,11 @@ class Aelastic:
                 self.sort = res['hits']['hits'][-1]["sort"]
                 self.savestate()
 
-#            print("######################################################################")
+            if self.config['output'] is True:
+                print("######################################################################")
             for hit in res['hits']['hits']:
-#               print("%s - %s" % (hit['_id'],hit['_source']['@timestamp']))
+                if self.config['output'] is True:
+                    print("%s - %s" % (hit['_id'],hit['_source']['@timestamp']))
                 self.logger.debug(json.dumps(hit).encode("ascii"))
                 self.sock.send(json.dumps(hit).encode("ascii"))
                 self.sock.send("\n".encode())
@@ -119,9 +121,9 @@ class Aelastic:
             self.logger.error("Error in elasticsearch-request", exc_info=False)
             self.sock.send("\n".encode())
             time.sleep(self.config['sleeptime'])
-
-#        if self.stopper is not True:
-#            self.run()
+        except BrokenPipeError:
+            self.logger.error("Client disconnected", exc_info=False)
+            self.stopper = True
 
     def setsock(self, sock):
         """Setter for the unix-socket
@@ -160,8 +162,6 @@ class Aelastic:
             while self.stopper is False:
                 self.logger.debug("Starting another run..")
                 self.handler()
-#                self.timer = threading.Timer(self.config['time'], self.handler)
-#                self.timer.start()
         except KeyboardInterrupt:
             self.logger.debug("KeyboardInterrupt detected...")
             self.stopper = True
@@ -171,8 +171,6 @@ class Aelastic:
         """
         self.logger.debug("Cleaning up socket and scheduler")
         self.stopper = True
-#        if self.timer is not None:
-#            self.timer.cancel()
         if self.sock is not None:
             self.sock.close()
         self.savestate()
