@@ -110,6 +110,7 @@ class Aelastic:
                 self.logger.debug(json.dumps(hit).encode("ascii"))
                 self.sock.send(json.dumps(hit).encode("ascii"))
                 self.sock.send("\n".encode())
+                self.sock.send("\n".encode())
 
 
         except ElasticsearchException:
