@@ -109,6 +109,7 @@ class Aelastic:
 
             if res['hits']['hits']:
                 self.sort = res['hits']['hits'][-1]["sort"]
+                self.savestate()
 
         except ElasticsearchException:
             self.logger.error("Error in elasticsearch-request", exc_info=False)
