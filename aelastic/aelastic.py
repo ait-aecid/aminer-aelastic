@@ -14,6 +14,7 @@ import logging
 import json
 import copy
 import time
+import ast
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch import ElasticsearchException
@@ -57,6 +58,7 @@ class Aelastic:
         'searchsize': 100,
         'index': 'aminer',
         'statefile': '/var/lib/aelastic/state',
+        'query': {"match_all": {}},
         'savestate': True,
         'timestamp': '@timestamp',
         'output': False,
@@ -90,14 +92,15 @@ class Aelastic:
         """
         try:
             self.elasticsearch.indices.refresh(index=self.config['index'])
+            query = ast.literal_eval(self.config['query'])
             if self.sort is None:
                 res = self.elasticsearch.search(index=self.config['index'],
-                                                body={"query": {"match_all": {}},
+                                                body={"query": query,
                                                       "size": self.config['searchsize'],
                                                       "sort": [{self.config['timestamp']: "asc"}]})
             else:
                 res = self.elasticsearch.search(index=self.config['index'],
-                                                body={"query": {"match_all": {}},
+                                                body={"query": query,
                                                       "size": self.config['searchsize'],
                                                       "sort": [{self.config['timestamp']: "asc"}],
                                                       "search_after": self.sort})
