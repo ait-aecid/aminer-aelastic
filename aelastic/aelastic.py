@@ -58,11 +58,12 @@ class Aelastic:
         'searchsize': 100,
         'index': 'aminer',
         'statefile': '/var/lib/aelastic/state',
-        'query': {"match_all": {}},
+        'query': '{"match_all": {}}',
         'savestate': True,
         'timestamp': '@timestamp',
         'output': False,
-        'sleeptime': 5
+        'sleeptime': 5,
+        'filters': False
     }
 
     def __init__(self, **configs):
@@ -71,6 +72,7 @@ class Aelastic:
         self.stopper = False
         self.sort = None
         self.sock = None
+        self.filters = None
         self.logger = logging.getLogger(__name__)
 
         for key in self.config:
@@ -80,6 +82,24 @@ class Aelastic:
         self.elasticsearch = Elasticsearch([self.config['host']])
         self.loadstate()
         self.logger.debug(self.sort)
+        self.setfilter(self.config['filters'])
+
+    def setfilter(self, filters):
+        if isinstance(filters, str):
+            self.filters = ast.literal_eval(filters)
+            if not isinstance(self.filters, list):
+                self.logger.info("Warning: conf-parameter filters is not a list!")
+                self.filters = None
+
+    def displayfilter(self,hit):
+        if self.filters is None:
+            return json.dumps(hit).encode("ascii")
+        else:
+            ret = {}
+            for f in self.filters:
+                if f in hit.keys():
+                    ret[f] = hit[f]
+            return json.dumps(ret).encode("ascii")
 
     def setlogger(self, logger):
         """Define a logger for this module
@@ -113,9 +133,10 @@ class Aelastic:
                 print("######################################################################")
             for hit in res['hits']['hits']:
                 if self.config['output'] == 'True':
-                    print("%s - %s" % (hit['_id'],hit['_source']['@timestamp']))
-                self.logger.debug(json.dumps(hit).encode("ascii"))
-                self.sock.send(json.dumps(hit).encode("ascii"))
+                    print("%s - %s" % (hit['_id'],hit['_source'][self.config['timestamp']]))
+                data = self.displayfilter(hit)
+                self.logger.debug(data)
+                self.sock.send(data)
                 self.sock.send("\n".encode())
                 self.sock.send("\n".encode())
 
