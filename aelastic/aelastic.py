@@ -135,10 +135,11 @@ class Aelastic:
                 if self.config['output'] == 'True':
                     print("%s - %s" % (hit['_id'],hit['_source'][self.config['timestamp']]))
                 data = self.displayfilter(hit)
-                self.logger.debug(data)
-                self.sock.send(data)
-                self.sock.send("\n".encode())
-                self.sock.send("\n".encode())
+                if data:
+                    self.logger.debug(data)
+                    self.sock.send(data)
+                    self.sock.send("\n".encode())
+                    self.sock.send("\n".encode())
 
 
         except ElasticsearchException:
