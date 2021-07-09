@@ -18,6 +18,7 @@ import ast
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch import ElasticsearchException
+from dictfilter import query
 
 
 class Aelastic:
@@ -96,10 +97,11 @@ class Aelastic:
             return json.dumps(hit).encode("ascii")
         else:
             ret = {}
-            for f in self.filters:
-                if f in hit.keys():
-                    ret[f] = hit[f]
-            return json.dumps(ret).encode("ascii")
+            ret = query(hit, self.filters)
+            if ret:
+                return json.dumps(ret).encode("ascii")
+            else:
+                return False
 
     def setlogger(self, logger):
         """Define a logger for this module
