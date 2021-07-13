@@ -145,8 +145,12 @@ class Aelastic:
 
 
         except ElasticsearchException:
-            self.logger.error("Error in elasticsearch-request", exc_info=False)
-            self.sock.send("\n".encode())
+            self.logger.error("Error in elasticsearch-request. Is elasticsearch down?", exc_info=False)
+            try:
+                self.sock.send("\n".encode())
+            except OSError:
+                self.logger.error("Client disconnected", exc_info=False)
+                self.stopper = True
             time.sleep(self.config['sleeptime'])
         except OSError:
             self.logger.error("Client disconnected", exc_info=False)
