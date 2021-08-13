@@ -1,2 +1,2 @@
 elasticsearch
-dictfilter
+dictfilter>=2.1
