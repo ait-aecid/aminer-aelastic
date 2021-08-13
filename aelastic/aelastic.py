@@ -64,7 +64,8 @@ class Aelastic:
         'timestamp': '@timestamp',
         'output': False,
         'sleeptime': 5,
-        'filters': False
+        'filters': False,
+        'filters_delim': '.'
     }
 
     def __init__(self, **configs):
@@ -97,7 +98,7 @@ class Aelastic:
             return json.dumps(hit).encode("ascii")
         else:
             ret = {}
-            ret = query(hit, self.filters)
+            ret = query(hit, self.filters, delimiter=self.config['filters_delim'])
             if ret:
                 return json.dumps(ret).encode("ascii")
             else:
@@ -114,15 +115,15 @@ class Aelastic:
         """
         try:
             self.elasticsearch.indices.refresh(index=self.config['index'])
-            query = ast.literal_eval(self.config['query'])
+            esquery = ast.literal_eval(self.config['query'])
             if self.sort is None:
                 res = self.elasticsearch.search(index=self.config['index'],
-                                                body={"query": query,
+                                                body={"query": esquery,
                                                       "size": self.config['searchsize'],
                                                       "sort": [{self.config['timestamp']: "asc"}]})
             else:
                 res = self.elasticsearch.search(index=self.config['index'],
-                                                body={"query": query,
+                                                body={"query": esquery,
                                                       "size": self.config['searchsize'],
                                                       "sort": [{self.config['timestamp']: "asc"}],
                                                       "search_after": self.sort})
